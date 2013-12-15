@@ -1,0 +1,11 @@
+{
+    "pnet": {
+        "api": {
+            "baseUrl": "https://api.phish.net/api.js",
+            "defaults": {
+                "api": "2.0",
+                "format": "json"
+            }
+        }
+    }
+}

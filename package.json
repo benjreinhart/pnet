@@ -1,0 +1,42 @@
+{
+    "name": "pnet"
+  , "version": "0.0.1"
+  , "description": "Simple Node.js client for the Phish.net API"
+  , "author": "benjreinhart"
+  , "preferGlobal": true
+  , "engines":
+    {
+      "node": ">=0.10.0"
+    }
+
+  , "dependencies":
+    {
+        "nopt": "~2.1.2"
+      , "request": "~2.30.0"
+      , "underscore": "~1.5.2"
+    }
+
+  , "devDependencies":
+    {
+        "coffee-script-redux": "~2.0.0-beta7"
+    }
+
+  , "repository":
+    {
+        "type" : "git"
+      , "url"  : "git@github.com:benjreinhart/pnet.git"
+    }
+
+  , "bugs":
+    {
+        "url": "https://github.com/benjreinhart/pnet/issues"
+    }
+
+  , "bin":
+    {
+        "pnet": "./bin/pnet"
+    }
+
+  , "license": "MIT"
+  , "main": "lib/index.js"
+}
