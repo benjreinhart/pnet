@@ -97,6 +97,11 @@ if options['url-only']
   process.exit 0
 
 pnet.get params, (err, resource) ->
+  if err?
+    console.error("ERROR requesting #{err.url}")
+    console.error(err.message ? JSON.stringify(error))
+    process.exit 1
+
   stringified = JSON.stringify(resource, null, 4)
 
   if options.output?
