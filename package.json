@@ -1,6 +1,6 @@
 {
     "name": "pnet"
-  , "version": "0.0.1"
+  , "version": "0.0.2"
   , "description": "Simple Node.js client for the Phish.net API"
   , "author": "benjreinhart"
   , "preferGlobal": true
