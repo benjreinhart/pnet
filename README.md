@@ -43,7 +43,7 @@ pnet -m shows.setlists.get -d 2013-10-31 -o ~/setlists/halloween_2013.json
                         the phish.net API; i.e. '-p venueid:123456 -p year:2012'
 
 --configure             Specify colon-delimited key value pairs to be used as
-                        defaults for all phish.net API calls. i.e.
+                        defaults for all phish.net API calls through the CLI. i.e.
                         '--configure apikey=your-api-key --configure api:2.0'
 --defaults              Print the defaults that have been set via the --configure
                         flag and exit
@@ -88,7 +88,7 @@ The pnet CLI comes with its own set of defaults which can be found in `config.js
 * format: `json`
 * api: `2.0`
 
-Lastly, you can see the URL that will be requested if you provide the `--url-only` flag, i.e.
+Lastly, if you only want the URL that is being requested instead of actually making the request, you can provide the `--url-only` flag, i.e.
 
 ```
 > pnet -m shows.setlists.get -d 2013-10-31 --url-only
