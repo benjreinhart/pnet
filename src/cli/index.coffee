@@ -79,7 +79,6 @@ if method = options.method
     method = "pnet.#{method}"
   params.method = method
 
-
 if isEmpty(params.method)
   console.error "ERROR: must specify a phish.net API method param"
   process.exit 1
