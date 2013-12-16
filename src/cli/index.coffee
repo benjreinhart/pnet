@@ -44,7 +44,7 @@ if options.help
                           the phish.net API; i.e. '-p venueid:123456 -p year:2012'
 
   --configure             Specify colon-delimited key value pairs to be used as
-                          defaults for all phish.net API calls. i.e.
+                          defaults for all phish.net API calls through the CLI. i.e.
                           '--configure apikey=your-api-key --configure api:2.0'
   --defaults              Print the defaults that have been set via the --configure
                           flag and exit
