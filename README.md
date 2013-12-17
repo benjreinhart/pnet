@@ -1,29 +1,68 @@
 ## pnet
 
-pnet is a module for making simple `get`requests to the [Phish.net API](http://api.phish.net/). It comes with a command line interface and a module interface.
+pnet is an API client for the [phish.net API](http://api.phish.net/). It comes with sane defaults, a command line interface and a module interface.
 
 ### Install
+
+`npm install pnet`
+
+If you're planning on using the CLI, it's probably best to install it globally:
 
 `npm install -g pnet`
 
 ## Module Interface
 
-The module exposes two methods: `get` and `buildPhishNetUrl`.
+#### get(method, params, callback) → undefined
+
+Performs a `GET` against the phish.net API with the specified `method` and `params`.
+
+* `method` (String, required) - The phish.net API method. Preceeding 'pnet.' is optional.
+* `params` (Object, optional) - Params to be passed in the API call.
+* `callback(err, parsedJSONResponse)` (Function, required) - The function to be called when the request completes or errors out. The function will be passed two arguments, the first argument is an `Error` object if one has occurred or `null`. The second argument is the parsed JSON response from the phish.net API.
+
+#### urlFor(method, params) → String
+
+Constructs a URL for the phish.net API with the given method and params.
+
+* `method` (String, required) - The phish.net API method. Preceeding 'pnet.' is optional.
+* `params` (Object, optional) - Params to be passed in the API call.
+
+#### apikey(key) → String or undefined
+
+Sets a default phish.net API key. When called with no args, it returns the API key.
+
+* `key` (String or undefined, optional) - When passed a value other than `null` or `undefined`, it sets the default API key to `key`. When called with 0 arguments, it returns the value that was set or `undefined`. When called explicitly with `null` or `undefined`, it unsets the current value of the API key from the default params.
+
+### Examples
 
 ```javascript
 var pnet = require('pnet');
+var method = 'pnet.shows.query';
 var params = {
-  apikey: '123456',
-  method: 'pnet.shows.query',
   year: 2013,
+  month: 8
 }
 
-pnet.buildPhishNetUrl(params);
-// => https://api.phish.net/api.js?api=2.0&format=json&apikey=123456&method=pnet.shows.query&year=2013'
+// Set default API key to be used
+pnet.apikey("a1b2c3");
+pnet.apikey(); // => "a1b2c3"
 
-pnet.get(params, function(err, parsedJSONResponse){
+pnet.urlFor(method, params);
+// => https://api.phish.net/api.js?api=2.0&format=json&apikey=a1b2c3&method=pnet.shows.query&year=2013&month=8'
+
+// Override default apikey
+pnet.urlFor(method, extend(params, {apikey: '123456'}));
+// => https://api.phish.net/api.js?api=2.0&format=json&apikey=123456&method=pnet.shows.query&year=2013&month=8'
+
+pnet.get(method, params, function(err, parsedJSONResource){
   // do stuff
 });
+
+// Remove default apikey
+pnet.apikey undefined
+
+// Same as above
+pnet.apikey null
 ```
 
 ## Command Line Interface

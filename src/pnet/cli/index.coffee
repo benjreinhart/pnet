@@ -2,7 +2,7 @@ fs = require 'fs'
 Path = require 'path'
 nopt = require 'nopt'
 defaults = require './defaults'
-{extend, isEmpty} = require 'underscore'
+{extend, omit} = require 'underscore'
 
 parseColonDelimitedPairs = (pairs = []) ->
   pairs.reduce ((memo, param) ->
@@ -68,32 +68,20 @@ if options.configure
 #############
 
 params = extend defaults.get(), parseColonDelimitedPairs(options.params)
-
-if method = options.argv.remain[0]
-  unless /^pnet\./.test(method)
-    method = "pnet.#{method}"
-  params.method = method
-
-if isEmpty(params.method)
-  console.error "ERROR: must specify a phish.net API method param"
-  process.exit 1
+method = options.argv.remain[0] ? params.method
+params = omit params, "method"
 
 if options.date
   params.showdate = options.date
 
-if params.showdate? && !/^\d{4}-\d{2}-\d{2}$/.test(params.showdate)
-  console.error "ERROR: date must be in format YYYY-MM-DD"
-  process.exit 1
-
 pnet = require(Path.join __dirname, '..', '..')
 
 if options['url-only']
-  console.log pnet.buildPhishNetUrl(params)
+  console.log pnet.urlFor(method, params)
   process.exit 0
 
-pnet.get params, (err, resource) ->
+pnet.get method, params, (err, resource) ->
   if err?
-    console.error("ERROR requesting #{err.url}")
     console.error(err.message ? JSON.stringify(error))
     process.exit 1
 

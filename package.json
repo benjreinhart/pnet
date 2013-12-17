@@ -3,7 +3,6 @@
   , "version": "0.0.2"
   , "description": "Simple Node.js client for the Phish.net API"
   , "author": "benjreinhart"
-  , "preferGlobal": true
   , "engines":
     {
       "node": ">=0.10.0"
@@ -18,7 +17,10 @@
 
   , "devDependencies":
     {
-        "coffee-script-redux": "~2.0.0-beta7"
+        "chai": "~1.8.1"
+      , "mocha": "~1.15.1"
+      , "sinon": "~1.7.3"
+      , "coffee-script-redux": "~2.0.0-beta7"
     }
 
   , "repository":
