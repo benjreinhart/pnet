@@ -29,15 +29,12 @@ pnet.get(params, function(err, parsedJSONResponse){
 ## Command Line Interface
 
 ```
-USAGE: pnet OPT*
+USAGE: pnet method [options]
 
-pnet -m shows.setlists.get -d 2013-10-31 -o ~/setlists/halloween_2013.json
+pnet shows.setlists.get -d 2013-10-31 -o ~/setlists/halloween_2013.json
 
 -d, --date              Specify a `showdate` param to be used in API call.
                         Shorthand for '-p showdate:YYYY-MM-DD'
--m, --method            The phish.net API method without the preceeding 'pnet.',
-                        for example, pnet.shows.query would be '-m shows.query'.
-                        Shorthand for '-p method:pnet.shows.query'
 -o, --output            Output to file instead of STDOUT
 -p, --params            Specify colon-delimited key value pairs as arguments to
                         the phish.net API; i.e. '-p venueid:123456 -p year:2012'
@@ -59,10 +56,10 @@ pnet -m shows.setlists.get -d 2013-10-31 -o ~/setlists/halloween_2013.json
 > pnet -p method:pnet.shows.setlists.get -p showdate:2013-10-31 -o ~/shows/halloween_2013.json
 ```
 
-The following is shorthand for the above:
+The following is shorthand for the above (optional preceeding "pnet." for the method):
 
 ```
-> pnet -m shows.setlists.get -d 2013-10-31 -o ~/shows/halloween_2013.json
+> pnet shows.setlists.get -d 2013-10-31 -o ~/shows/halloween_2013.json
 ```
 
 Since you're likely to have defaults for your API calls (i.e. apikey, api version, format), you can configure pnet with defaults.
@@ -91,7 +88,7 @@ The pnet CLI comes with its own set of defaults which can be found in `config.js
 Lastly, if you only want the URL that is being requested instead of actually making the request, you can provide the `--url-only` flag, i.e.
 
 ```
-> pnet -m shows.setlists.get -d 2013-10-31 --url-only
+> pnet shows.setlists.get -d 2013-10-31 --url-only
 https://api.phish.net/api.js?api=2.0&format=json&apikey=123456&method=pnet.shows.setlists.get&showdate=2013-10-31
 ```
 

@@ -5,40 +5,35 @@ defaults = require './defaults'
 {extend, isEmpty} = require 'underscore'
 
 parseColonDelimitedPairs = (pairs = []) ->
-  fn = (memo, param) ->
+  pairs.reduce ((memo, param) ->
     if param.indexOf(':') isnt -1
       [key, value] = param.split(':')
       memo[key] = value
     memo
-  pairs.reduce fn, {}
+  ), {}
 
 options = do ->
   opts =
     configure: [String, Array]
     date: String
-    method: String
     output: String
     params: [String, Array]
 
   aliases =
     d: '--date'
-    m: '--method'
     o: '--output'
     p: '--params'
 
-  nopt opts, aliases, process.argv, 1
+  nopt opts, aliases, process.argv, 2
 
 if options.help
   console.log "
-  USAGE: pnet OPT*
+  USAGE: pnet method [options]
 
-  pnet -m shows.setlists.get -d 2013-10-31 -o ~/setlists/halloween_2013.json
+  pnet shows.setlists.get -d 2013-10-31 -o ~/setlists/halloween_2013.json
 
   -d, --date              Specify a `showdate` param to be used in API call.
                           Shorthand for '-p showdate:YYYY-MM-DD'
-  -m, --method            The phish.net API method without the preceeding 'pnet.',
-                          for example, pnet.shows.query would be '-m shows.query'.
-                          Shorthand for '-p method:pnet.shows.query'
   -o, --output            Output to file instead of STDOUT
   -p, --params            Specify colon-delimited key value pairs as arguments to
                           the phish.net API; i.e. '-p venueid:123456 -p year:2012'
@@ -56,7 +51,7 @@ if options.help
   process.exit 0
 
 if options.version
-  console.log(require(Path.join __dirname, '../../package.json').version)
+  console.log(require(Path.join __dirname, '..', '..', '..', 'package.json').version)
   process.exit 0
 
 if options.defaults
@@ -74,7 +69,7 @@ if options.configure
 
 params = extend defaults.get(), parseColonDelimitedPairs(options.params)
 
-if method = options.method
+if method = options.argv.remain[0]
   unless /^pnet\./.test(method)
     method = "pnet.#{method}"
   params.method = method
@@ -90,7 +85,7 @@ if params.showdate? && !/^\d{4}-\d{2}-\d{2}$/.test(params.showdate)
   console.error "ERROR: date must be in format YYYY-MM-DD"
   process.exit 1
 
-pnet = require(Path.join '..')
+pnet = require(Path.join __dirname, '..', '..')
 
 if options['url-only']
   console.log pnet.buildPhishNetUrl(params)
