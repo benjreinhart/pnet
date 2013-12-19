@@ -99,16 +99,17 @@ params = omit params, "method"
 if options.date
   params.showdate = options.date
 
-pnet = require PACKAGE_ROOT
-
 if options['url-only']
-  console.log pnet.urlFor(method, params)
-  process.exit 0
+  params.urlOnly = true
 
-pnet.get method, params, (err, resource) ->
+(require PACKAGE_ROOT).get method, params, (err, resource) ->
   if err?
-    console.error(err.message ? JSON.stringify(error))
+    console.error(err.message ? JSON.stringify(err))
     process.exit 1
+
+  if options['url-only']
+    console.log resource
+    process.exit 0
 
   stringified = JSON.stringify(resource, null, 4)
 

@@ -16,37 +16,6 @@ describe 'pnet', ->
     request.get.restore?()
     pnet.apikey undefined
 
-  describe '#urlFor', ->
-    it 'constructs a valid url with the method and additional params', ->
-      url = pnet.urlFor 'pnet.shows.query', {year: 2013, month: 8, apikey: 123456}
-
-      parsedUrl = URL.parse(url)
-      queryParams = parseQueryString(parsedUrl.query)
-
-      expect(parsedUrl.protocol).to.equal 'https:'
-      expect(parsedUrl.host).to.equal 'api.phish.net'
-      expect(parsedUrl.pathname).to.equal '/api.js'
-      expect(queryParams.method).to.equal 'pnet.shows.query'
-      expect(queryParams.year).to.equal '2013'
-      expect(queryParams.month).to.equal '8'
-      expect(queryParams.apikey).to.equal '123456'
-
-    it 'adds default params', ->
-      defaultParams = require('../config.json').pnet.api.defaults
-
-      url = pnet.urlFor 'pnet.shows.query', {year: 2013, month: 8}
-      parsedUrl = URL.parse(url)
-      queryParams = parseQueryString(parsedUrl.query)
-
-      for own key, value of defaultParams
-        expect(queryParams[key]).to.equal(value)
-
-    it 'allows the preceeding "pnet." in the method name to be optional', ->
-      url = pnet.urlFor 'shows.query', {year: 2013, month: 8, apikey: 123456}
-
-      queryParams = parseQueryString(URL.parse(url).query)
-      expect(queryParams.method).to.equal 'pnet.shows.query'
-
   describe '#get', ->
     stubs =
       august2013: require('./stubs/august_2013_shows')
@@ -56,7 +25,7 @@ describe 'pnet', ->
         sinon.stub request, 'get', (url, cb) ->
           process.nextTick(cb.bind null, null, {statusCode: 200}, JSON.stringify(stubs.august2013))
 
-      it 'requests the resource and returns the parsed body', (done) ->
+      it 'make the request with a valid url', (done) ->
         pnet.get 'shows.query', {year: 2013, month: 8, apikey: 123456}, (err, results) ->
           expect(request.get.calledOnce).to.be.true
 
@@ -71,7 +40,33 @@ describe 'pnet', ->
           expect(queryParams.month).to.equal '8'
           expect(queryParams.apikey).to.equal '123456'
 
+          done()
+
+      it 'requests the resource and returns the parsed body', (done) ->
+        pnet.get 'shows.query', {year: 2013, month: 8, apikey: 123456}, (err, results) ->
+          expect(request.get.calledOnce).to.be.true
           expect(results).to.deep.equal(stubs.august2013)
+
+          done()
+
+    describe 'passing a urlOnly param set to true', ->
+      it 'invokes the callback with the constructed url', (done) ->
+        sinon.spy request, 'get'
+
+        pnet.apikey "myawesomekey"
+        pnet.get 'shows.setlists.get', {showdate: '2013-10-31', urlOnly: true}, (err, url) ->
+          expect not request.get.called
+
+          parsedUrl = URL.parse(url)
+          queryParams = parseQueryString(parsedUrl.query)
+
+          expect(parsedUrl.protocol).to.equal 'https:'
+          expect(parsedUrl.host).to.equal 'api.phish.net'
+          expect(parsedUrl.pathname).to.equal '/api.js'
+          expect(queryParams.method).to.equal 'pnet.shows.setlists.get'
+          expect(queryParams.showdate).to.equal '2013-10-31'
+          expect(queryParams.apikey).to.equal 'myawesomekey'
+
           done()
 
     describe 'error responses', ->

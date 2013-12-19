@@ -18,14 +18,7 @@ Performs a `GET` against the phish.net API with the specified `method` and `para
 
 * `method` (String, required) - The phish.net API method. Preceeding 'pnet.' is optional.
 * `params` (Object, optional) - Params to be passed in the API call.
-* `callback(err, parsedJSONResponse)` (Function, required) - The function to be called when the request completes or errors out. The function will be passed two arguments, the first argument is an `Error` object if one has occurred or `null`. The second argument is the parsed JSON response from the phish.net API.
-
-#### urlFor(method, params) → String
-
-Constructs a URL for the phish.net API with the given method and params.
-
-* `method` (String, required) - The phish.net API method. Preceeding 'pnet.' is optional.
-* `params` (Object, optional) - Params to be passed in the API call.
+* `callback` (Function, required) - The function to be called when the request completes or errors out. The function will be passed two arguments, the first argument is an `Error` object if one has occurred or `null`. The second argument is the parsed JSON response from the phish.net API OR the request URL if the `urlOnly` param is `true`.
 
 #### apikey(key) → String or undefined
 
@@ -47,22 +40,16 @@ var params = {
 pnet.apikey("a1b2c3");
 pnet.apikey(); // => "a1b2c3"
 
-pnet.urlFor(method, params);
-// => https://api.phish.net/api.js?api=2.0&format=json&apikey=a1b2c3&method=pnet.shows.query&year=2013&month=8'
-
-// Override default apikey
-pnet.urlFor(method, extend(params, {apikey: '123456'}));
-// => https://api.phish.net/api.js?api=2.0&format=json&apikey=123456&method=pnet.shows.query&year=2013&month=8'
-
 pnet.get(method, params, function(err, parsedJSONResource){
   // do stuff
 });
 
 // Remove default apikey
-pnet.apikey undefined
+pnet.apikey(undefined);
+pnet.apikey(); // => undefined
 
 // Same as above
-pnet.apikey null
+pnet.apikey(null);
 ```
 
 ## Command Line Interface
