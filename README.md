@@ -17,7 +17,7 @@ If you're planning on using the CLI, it's probably best to install it globally:
 Performs a `GET` against the phish.net API with the specified `method` and `params`.
 
 * `method` (String, required) - The phish.net API method. Preceeding 'pnet.' is optional.
-* `params` (Object, optional) - Params to be passed in the API call.
+* `params` (Object, required) - Params to be passed in the API call.
 * `callback` (Function, required) - The function to be called when the request completes or errors out. The function will be passed two arguments, the first argument is an `Error` object if one has occurred or `null`. The second argument is the parsed JSON response from the phish.net API OR the request URL if the `urlOnly` param is `true`.
 
 #### apikey(key) → String or undefined
@@ -45,11 +45,8 @@ pnet.get(method, params, function(err, parsedJSONResource){
 });
 
 // Remove default apikey
-pnet.apikey(undefined);
+pnet.apikey(undefined); // or:  pnet.apikey(null);
 pnet.apikey(); // => undefined
-
-// Same as above
-pnet.apikey(null);
 ```
 
 ## Command Line Interface
