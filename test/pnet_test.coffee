@@ -116,6 +116,13 @@ describe 'pnet', ->
 
           done()
 
+      it 'returns an error when the method is not a valid phish.net API method', (done) ->
+        pnet.get 'pnet.i.dont.exist', {}, (err, result) ->
+          expect(err.message).to.equal 'method must be a valid phish.net API method'
+          expect not request.get.called
+
+          done()
+
       it 'returns an error when the showdate is incorrectly formatted', (done) ->
         pnet.get 'shows.setlists.get', {showdate: '2013-8-5'}, (err, result) ->
           expect(err.message).to.equal 'showdate must be in the format YYYY-MM-DD'

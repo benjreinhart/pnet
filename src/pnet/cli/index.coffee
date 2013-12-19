@@ -4,6 +4,8 @@ nopt = require 'nopt'
 defaults = require './defaults'
 {extend, omit} = require 'underscore'
 
+PACKAGE_ROOT = Path.join __dirname, '..', '..', '..'
+
 parseColonDelimitedPairs = (pairs = []) ->
   pairs.reduce ((memo, param) ->
     if param.indexOf(':') isnt -1
@@ -43,6 +45,7 @@ if options.help
                           '--configure apikey=your-api-key --configure api:2.0'
   --defaults              Print the defaults that have been set via the --configure
                           flag and exit
+  --list                  List the available phish.net API methods
   --help                  Display this message and exit
   --url-only              Print phish net API url and exit instead of
                           requesting the resource
@@ -51,7 +54,7 @@ if options.help
   process.exit 0
 
 if options.version
-  console.log(require(Path.join __dirname, '..', '..', '..', 'package.json').version)
+  console.log(require(PACKAGE_ROOT + '/package.json').version)
   process.exit 0
 
 if options.defaults
@@ -62,6 +65,28 @@ if options.configure
   defaults.set(parseColonDelimitedPairs(options.configure))
   process.exit 0
 
+if options.list
+  do ({documentation, methods} = require(PACKAGE_ROOT + '/config').pnet.api) ->
+    publicize = (str) ->
+      '\x1B[32m' + str + '\x1B[39m'
+
+    protect = (str) ->
+      '\x1B[31m' + str + '\x1B[39m'
+
+    message = [
+      "Documentation: #{documentation.baseUrl}\n"
+      publicize('Public method')
+      protect('Protected method') + '\n'
+    ].concat for own method, status of methods
+      line = (if status.protected then protect else publicize)(method)
+      spaces = 45 - line.length
+      while spaces--
+        line += ' '
+      line + documentation.baseUrl + "/#p=#{method}"
+
+    console.log('\n  ' + message.join('\n  ') + '\n')
+
+  process.exit 0
 
 #############
 # API calls #
@@ -74,7 +99,7 @@ params = omit params, "method"
 if options.date
   params.showdate = options.date
 
-pnet = require(Path.join __dirname, '..', '..')
+pnet = require PACKAGE_ROOT
 
 if options['url-only']
   console.log pnet.urlFor(method, params)

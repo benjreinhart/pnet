@@ -42,16 +42,17 @@ do ({baseUrl, defaults} = config.pnet.api, {omit} = require('underscore')) ->
     params = safeExtend defaults, params, {method}
     baseUrl + '?' + ("#{key}=#{value}" for own key, value of params).join '&'
 
-getParamErrors = (method, params = {}) ->
-  errors = []
+getParamErrors = do (availableMethods = config.pnet.api.methods) ->
+  (method, params = {}) ->
+    errors = []
 
-  if !method?
-    errors.push(param: 'method', message: 'must be a valid phish.net API method')
+    if !method? || !availableMethods[if /^pnet\./.test(method) then method else "pnet.#{method}"]?
+      errors.push(param: 'method', message: 'must be a valid phish.net API method')
 
-  if params.showdate? && !/^\d{4}-\d{2}-\d{2}$/.test(params.showdate)
-    errors.push(param: 'showdate', message: 'must be in the format YYYY-MM-DD')
+    if params.showdate? && !/^\d{4}-\d{2}-\d{2}$/.test(params.showdate)
+      errors.push(param: 'showdate', message: 'must be in the format YYYY-MM-DD')
 
-  (errors.length && errors) || null
+    (errors.length && errors) || null
 
 parseResponseBody = (body) ->
   parsed = JSON.parse(body)

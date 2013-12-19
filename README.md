@@ -83,6 +83,7 @@ pnet shows.setlists.get -d 2013-10-31 -o ~/setlists/halloween_2013.json
                         '--configure apikey=your-api-key --configure api:2.0'
 --defaults              Print the defaults that have been set via the --configure
                         flag and exit
+--list                  List the available phish.net API methods
 --help                  Display this message and exit
 --url-only              Print phish net API url and exit instead of
                         requesting the resource
