@@ -99,16 +99,13 @@ params = omit params, "method"
 if options.date
   params.showdate = options.date
 
-if options['url-only']
-  params.urlOnly = true
-
-(require PACKAGE_ROOT).get method, params, (err, resource) ->
+(require PACKAGE_ROOT).get method, params, (err, url, resource) ->
   if err?
     console.error(err.message ? JSON.stringify(err))
     process.exit 1
 
   if options['url-only']
-    console.log resource
+    console.log url
     process.exit 0
 
   stringified = JSON.stringify(resource, null, 4)

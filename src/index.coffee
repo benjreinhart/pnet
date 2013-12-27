@@ -1,18 +1,26 @@
-Path = require 'path'
-{omit} = require 'underscore'
+Setlist = require './pnet/setlist'
+{extend, omit} = require 'underscore'
 request = require 'request'
 
+SETLIST_METHODS = [
+  "pnet.shows.setlists.get"
+  "pnet.shows.setlists.latest"
+  "pnet.shows.setlists.random"
+  "pnet.shows.setlists.recent"
+  "pnet.shows.setlists.tiph"
+]
+
+# Also acts as `clone`
 safeExtend = do ({extend} = require 'underscore') ->
   -> extend {}, arguments...
 
-pnetConfig = safeExtend(require(Path.join __dirname, '..', 'config').pnet)
+pnetConfig = safeExtend(require('../config').pnet)
 pnetDefaults = safeExtend(pnetConfig.api.defaults)
 
 pnet = module.exports = {}
 
 pnet.get = (method, params = {}, callback) ->
   method = normalizeMethod(method)
-  [urlOnly, params] = [params.urlOnly, omit(params, 'urlOnly')]
 
   if error = getParamErrors(method, params)?[0]
     error = new Error(error.param + ' ' + error.message)
@@ -21,16 +29,12 @@ pnet.get = (method, params = {}, callback) ->
 
   url = urlFor method, params
 
-  if urlOnly is true
-    process.nextTick(callback.bind null, null, url)
-    return undefined
-
   request.get url, (err, response, body) ->
     if err? || !(200 <= +response.statusCode < 300)
       callback(err ? new Error "Response returned status code #{response.statusCode}")
     else
       try
-        callback(null, parseResponseBody(body))
+        callback(null, url, parseResponseBody(method, body))
       catch e
         callback(e)
   undefined
@@ -68,10 +72,14 @@ getParamErrors = (method, params = {}) ->
 
   (errors.length && errors) || null
 
-parseResponseBody = (body) ->
+parseResponseBody = (method, body) ->
   parsed = JSON.parse(body)
 
   if parsed.success? && parsed.success is 0
     throw (new Error parsed.reason ? "Request failed with success code 0")
+
+  if method in SETLIST_METHODS
+    parsed = for show in parsed
+      extend show, Setlist.parse(show.setlistdata)
 
   parsed

@@ -19,6 +19,7 @@ describe 'pnet', ->
   describe '#get', ->
     stubs =
       august2013: require('./stubs/august_2013_shows')
+      halloween2013: require('./stubs/2013-10-31')
 
     describe 'successful responses', ->
       beforeEach ->
@@ -26,9 +27,10 @@ describe 'pnet', ->
           process.nextTick(cb.bind null, null, {statusCode: 200}, JSON.stringify(stubs.august2013))
 
       it 'make the request with a valid url', (done) ->
-        pnet.get 'shows.query', {year: 2013, month: 8, apikey: 123456}, (err, results) ->
+        pnet.get 'shows.query', {year: 2013, month: 8, apikey: 123456}, (err, _, results) ->
           expect(request.get.calledOnce).to.be.true
 
+          # Asserts against what `request#get` was called with
           parsedUrl = URL.parse(request.get.firstCall.args[0])
           queryParams = parseQueryString(parsedUrl.query)
 
@@ -42,39 +44,100 @@ describe 'pnet', ->
 
           done()
 
-      it 'requests the resource and returns the parsed body', (done) ->
-        pnet.get 'shows.query', {year: 2013, month: 8, apikey: 123456}, (err, results) ->
+      it 'requests the resource and returns the requested URL and the parsed response body', (done) ->
+        pnet.get 'shows.query', {year: 2013, month: 8, apikey: 123456}, (err, url, results) ->
           expect(request.get.calledOnce).to.be.true
-          expect(results).to.deep.equal(stubs.august2013)
 
-          done()
-
-    describe 'passing a urlOnly param set to true', ->
-      it 'invokes the callback with the constructed url', (done) ->
-        sinon.spy request, 'get'
-
-        pnet.apikey "myawesomekey"
-        pnet.get 'shows.setlists.get', {showdate: '2013-10-31', urlOnly: true}, (err, url) ->
-          expect not request.get.called
-
+          # Asserts against the second callback argument
           parsedUrl = URL.parse(url)
           queryParams = parseQueryString(parsedUrl.query)
 
           expect(parsedUrl.protocol).to.equal 'https:'
           expect(parsedUrl.host).to.equal 'api.phish.net'
           expect(parsedUrl.pathname).to.equal '/api.js'
-          expect(queryParams.method).to.equal 'pnet.shows.setlists.get'
-          expect(queryParams.showdate).to.equal '2013-10-31'
-          expect(queryParams.apikey).to.equal 'myawesomekey'
+          expect(queryParams.method).to.equal 'pnet.shows.query'
+          expect(queryParams.year).to.equal '2013'
+          expect(queryParams.month).to.equal '8'
+          expect(queryParams.apikey).to.equal '123456'
+
+          expect(results).to.deep.equal(stubs.august2013)
 
           done()
+
+
+    # SETLIST_METHODS = [
+    #   "pnet.shows.setlists.get"
+    #   "pnet.shows.setlists.latest"
+    #   "pnet.shows.setlists.random"
+    #   "pnet.shows.setlists.recent"
+    #   "pnet.shows.setlists.tiph"
+    # ]
+    #
+    # These methods return setlists in html, which have
+    # to be parsed out. The following tests assert that
+    # when the requesting method is in this list, then
+    # the setlists are properly parsed out.
+    #
+    describe 'requesting setlist methods', ->
+      responses =
+        halloween2013: require('./stubs/2013-10-31_parsed_response')
+
+      beforeEach ->
+        sinon.stub request, 'get', (url, cb) ->
+          process.nextTick(cb.bind null, null, {statusCode: 200}, JSON.stringify(stubs.halloween2013))
+
+      it 'parses out the setlist when the requesting method is `get`', (done) ->
+        method = 'shows.setlists.get'
+
+        pnet.get method, {showdate: '2013-10-31', apikey: 123456}, (err, url, results) ->
+          expect(request.get.calledOnce).to.be.true
+          expect(results).to.deep.equal responses.halloween2013
+
+          done()
+
+      it 'parses out the setlist when the requesting method is `latest`', (done) ->
+        method = 'shows.setlists.latest'
+
+        pnet.get method, {apikey: 123456}, (err, url, results) ->
+          expect(request.get.calledOnce).to.be.true
+          expect(results).to.deep.equal responses.halloween2013
+
+          done()
+
+      it 'parses out the setlist when the requesting method is `random`', (done) ->
+        method = 'shows.setlists.random'
+
+        pnet.get method, {apikey: 123456}, (err, url, results) ->
+          expect(request.get.calledOnce).to.be.true
+          expect(results).to.deep.equal responses.halloween2013
+
+          done()
+
+      it 'parses out the setlist when the requesting method is `recent`', (done) ->
+        method = 'shows.setlists.recent'
+
+        pnet.get method, {apikey: 123456}, (err, url, results) ->
+          expect(request.get.calledOnce).to.be.true
+          expect(results).to.deep.equal responses.halloween2013
+
+          done()
+
+      it 'parses out the setlist when the requesting method is `tiph`', (done) ->
+        method = 'shows.setlists.tiph'
+
+        pnet.get method, {apikey: 123456}, (err, url, results) ->
+          expect(request.get.calledOnce).to.be.true
+          expect(results).to.deep.equal responses.halloween2013
+
+          done()
+
 
     describe 'error responses', ->
       it 'returns an error when something goes wrong', (done) ->
         sinon.stub request, 'get', (url, cb) ->
           process.nextTick(cb.bind null, (new Error 'Something went wrong'))
 
-        pnet.get 'shows.query', {year: 2013, month: 8, apikey: 123456}, (err, results) ->
+        pnet.get 'shows.query', {year: 2013, month: 8, apikey: 123456}, (err, _, results) ->
           expect(request.get.calledOnce).to.be.true
           expect(err.message).to.equal 'Something went wrong'
 
@@ -84,7 +147,7 @@ describe 'pnet', ->
         sinon.stub request, 'get', (url, cb) ->
           process.nextTick(cb.bind null, null, {statusCode: 200}, '{"success": 0, "reason": "General API Error"}')
 
-        pnet.get 'shows.setlists.get', { showdate: '2013-11-05', apikey: 123456}, (err, results) ->
+        pnet.get 'shows.setlists.get', { showdate: '2013-11-05', apikey: 123456}, (err, _, results) ->
           expect(request.get.calledOnce).to.be.true
           expect(err.message).to.equal 'General API Error'
 
@@ -94,7 +157,7 @@ describe 'pnet', ->
         sinon.stub request, 'get', (url, cb) ->
           process.nextTick(cb.bind null, null, {statusCode: 500}, '')
 
-        pnet.get 'shows.setlists.get', { showdate: '2013-11-05', apikey: 123456}, (err, results) ->
+        pnet.get 'shows.setlists.get', { showdate: '2013-11-05', apikey: 123456}, (err, _, results) ->
           expect(request.get.calledOnce).to.be.true
           expect(err.message).to.equal 'Response returned status code 500'
 
@@ -105,21 +168,21 @@ describe 'pnet', ->
         sinon.spy request, 'get'
 
       it 'returns an error when the method is null', (done) ->
-        pnet.get null, {}, (err, result) ->
+        pnet.get null, {}, (err, _, result) ->
           expect(err.message).to.equal 'method must be a valid phish.net API method'
           expect not request.get.called
 
           done()
 
       it 'returns an error when the method is not a valid phish.net API method', (done) ->
-        pnet.get 'pnet.i.dont.exist', {}, (err, result) ->
+        pnet.get 'pnet.i.dont.exist', {}, (err, _, result) ->
           expect(err.message).to.equal 'method must be a valid phish.net API method'
           expect not request.get.called
 
           done()
 
       it 'returns an error when the showdate is incorrectly formatted', (done) ->
-        pnet.get 'shows.setlists.get', {showdate: '2013-8-5'}, (err, result) ->
+        pnet.get 'shows.setlists.get', {showdate: '2013-8-5'}, (err, _, result) ->
           expect(err.message).to.equal 'showdate must be in the format YYYY-MM-DD'
           expect not request.get.called
 
@@ -136,7 +199,7 @@ describe 'pnet', ->
       pnet.apikey 'myapikey'
       expect(pnet.apikey()).to.equal 'myapikey'
 
-      pnet.get 'shows.query', {year: 2013, month: 8}, (err, results) ->
+      pnet.get 'shows.query', {year: 2013, month: 8}, (err, _, results) ->
         expect(request.get.calledOnce).to.be.true
         parsedUrl = URL.parse(request.get.firstCall.args[0])
         expect(parseQueryString(parsedUrl.query).apikey).to.equal 'myapikey'
@@ -149,7 +212,7 @@ describe 'pnet', ->
       pnet.apikey 'myapikey'
       expect(pnet.apikey()).to.equal 'myapikey'
 
-      pnet.get 'shows.query', {year: 2013, month: 8, apikey: 123}, (err, results) ->
+      pnet.get 'shows.query', {year: 2013, month: 8, apikey: 123}, (err, _, results) ->
         expect(request.get.calledOnce).to.be.true
         parsedUrl = URL.parse(request.get.firstCall.args[0])
         expect(parseQueryString(parsedUrl.query).apikey).to.equal '123'
@@ -160,7 +223,7 @@ describe 'pnet', ->
       pnet.apikey 'key'
       pnet.apikey undefined
 
-      pnet.get 'shows.query', {year: 2013, month: 8}, (err, results) ->
+      pnet.get 'shows.query', {year: 2013, month: 8}, (err, _, results) ->
         expect(request.get.calledOnce).to.be.true
         parsedUrl = URL.parse(request.get.firstCall.args[0])
 
@@ -178,7 +241,7 @@ describe 'pnet', ->
       pnet.apikey 'key'
       pnet.apikey null
 
-      pnet.get 'shows.query', {year: 2013, month: 8}, (err, results) ->
+      pnet.get 'shows.query', {year: 2013, month: 8}, (err, _, results) ->
         expect(request.get.calledOnce).to.be.true
         parsedUrl = URL.parse(request.get.firstCall.args[0])
 

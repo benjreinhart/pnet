@@ -22,5 +22,8 @@ $(LIBDIR)/%.js: $(SRCDIR)/%.coffee
 test: build
 	@$(MOCHA) --reporter spec --recursive --colors
 
+test/%.coffee: build
+	$(MOCHA) --reporter spec --recursive  --colors "$@"
+
 tag:
 	git tag v`./node_modules/.bin/coffee -e --cli "console.log JSON.parse(require('fs').readFileSync('package.json')).version"`
