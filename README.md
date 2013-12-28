@@ -16,15 +16,15 @@ If you're planning on using the CLI, it's probably best to install it globally:
 
 Performs a `GET` against the phish.net API with the specified `method` and `params`.
 
-* `method` (String, required) - The phish.net API method. Preceeding 'pnet.' is optional.
-* `params` (Object, required) - Params to be passed in the API call.
-* `callback` (Function, required) - The function to be called when the request completes or errors out. The function will be passed two arguments, the first argument is an `Error` object if one has occurred or `null`. The second argument is the parsed JSON response from the phish.net API OR the request URL if the `urlOnly` param is `true`.
+* `method` {String} - The phish.net API method. Preceeding 'pnet.' is optional.
+* `params` {Object} - Params to be passed in the API call.
+* `callback` {Function} - The function to be called when the request completes or errors out. The function will be passed three arguments, the first argument is an `Error` object if one has occurred or `null`. The second argument is the requested URL and the third is the parsed JSON response from the phish.net API.
 
 #### apikey(key) → String or undefined
 
 Sets a default phish.net API key. When called with no args, it returns the API key.
 
-* `key` (String or undefined, optional) - When passed a value other than `null` or `undefined`, it sets the default API key to `key`. When called with 0 arguments, it returns the value that was set or `undefined`. When called explicitly with `null` or `undefined`, it unsets the current value of the API key from the default params.
+* `key` {String|undefined|null} - When passed a value other than `null` or `undefined`, it sets the default API key to `key`. When called with 0 arguments, it returns the value that was set or `undefined`. When called explicitly with `null` or `undefined`, it unsets the current value of the API key from the default params.
 
 ### Examples
 
@@ -40,7 +40,7 @@ var params = {
 pnet.apikey("a1b2c3");
 pnet.apikey(); // => "a1b2c3"
 
-pnet.get(method, params, function(err, parsedJSONResource){
+pnet.get(method, params, function(err, url, parsedJSONResource){
   // do stuff
 });
 
@@ -109,7 +109,7 @@ The pnet CLI comes with its own set of defaults which can be found in `config.js
 * format: `json`
 * api: `2.0`
 
-Lastly, if you only want the URL that is being requested instead of actually making the request, you can provide the `--url-only` flag, i.e.
+Lastly, if you want to print the phish.net request URL to STDOUT, you can provide the `--url-only` flag, i.e.
 
 ```
 > pnet shows.setlists.get -d 2013-10-31 --url-only
