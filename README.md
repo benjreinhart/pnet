@@ -109,12 +109,16 @@ The pnet CLI comes with its own set of defaults which can be found in `config.js
 * format: `json`
 * api: `2.0`
 
-Lastly, if you want to print the phish.net request URL to STDOUT, you can provide the `--url-only` flag, i.e.
+If you want to print the phish.net request URL to STDOUT, you can provide the `--url-only` flag, i.e.
 
 ```
 > pnet shows.setlists.get -d 2013-10-31 --url-only
 https://api.phish.net/api.js?api=2.0&format=json&apikey=123456&method=pnet.shows.setlists.get&showdate=2013-10-31
 ```
+
+Lastly, if you want to see all the methods phish.net exposes, just `--list` them:
+
+![pnet --list](http://f.cl.ly/items/362S0J1H2q0c172x1h06/Screen%20Shot%202013-12-28%20at%203.45.17%20PM.png)
 
 ## License
 
