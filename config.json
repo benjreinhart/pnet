@@ -5,6 +5,45 @@
             "defaults": {
                 "api": "2.0",
                 "format": "json"
+            },
+            "documentation": {
+                "baseUrl": "http://api.phish.net/docu"
+            },
+            "methods": {
+                "pnet.api.authkey.get"        : { "protected": true },
+                "pnet.api.authorize"          : { "protected": true },
+                "pnet.api.authorized.check"   : { "protected": true },
+                "pnet.api.isAuthorized"       : { "protected": true },
+                "pnet.artists.get"            : { "protected": false },
+                "pnet.blog.get"               : { "protected": false },
+                "pnet.blog.item.get"          : { "protected": false },
+                "pnet.collections.get"        : { "protected": true },
+                "pnet.collections.query"      : { "protected": true },
+                "pnet.forum.canpost"          : { "protected": true },
+                "pnet.forum.get"              : { "protected": false },
+                "pnet.forum.thread.get"       : { "protected": true },
+                "pnet.forum.thread.new"       : { "protected": true },
+                "pnet.forum.thread.respond"   : { "protected": true },
+                "pnet.news.comments.get"      : { "protected": false },
+                "pnet.news.get"               : { "protected": false },
+                "pnet.reviews.query"          : { "protected": true },
+                "pnet.reviews.recent"         : { "protected": false },
+                "pnet.shows.links.get"        : { "protected": true },
+                "pnet.shows.query"            : { "protected": true },
+                "pnet.shows.setlists.get"     : { "protected": true },
+                "pnet.shows.setlists.latest"  : { "protected": false },
+                "pnet.shows.setlists.random"  : { "protected": false },
+                "pnet.shows.setlists.recent"  : { "protected": false },
+                "pnet.shows.setlists.tiph"    : { "protected": false },
+                "pnet.shows.upcoming"         : { "protected": false },
+                "pnet.user.get"               : { "protected": true },
+                "pnet.user.myshows.add"       : { "protected": true },
+                "pnet.user.myshows.get"       : { "protected": true },
+                "pnet.user.myshows.remove"    : { "protected": true },
+                "pnet.user.register"          : { "protected": true },
+                "pnet.user.shows.rate"        : { "protected": true },
+                "pnet.user.uid.get"           : { "protected": true },
+                "pnet.user.username.check"    : { "protected": true }
             }
         }
     }
