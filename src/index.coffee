@@ -1,5 +1,5 @@
 Setlist = require './pnet/setlist'
-{extend, omit} = require 'underscore'
+{omit} = (underscore = require 'underscore')
 request = require 'request'
 
 SETLIST_METHODS = [
@@ -11,7 +11,7 @@ SETLIST_METHODS = [
 ]
 
 # Also acts as `clone`
-safeExtend = do ({extend} = require 'underscore') ->
+safeExtend = do ({extend} = underscore) ->
   -> extend {}, arguments...
 
 pnetConfig = safeExtend(require('../config').pnet)
@@ -80,6 +80,6 @@ parseResponseBody = (method, body) ->
 
   if method in SETLIST_METHODS
     parsed = for show in parsed
-      extend show, Setlist.parse(show.setlistdata)
+      safeExtend show, Setlist.parse(show.setlistdata)
 
   parsed
