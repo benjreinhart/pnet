@@ -1,3 +1,9 @@
+0.1.1 / 2014-01-26
+==================
+
+* Minor cleanups
+* Fix bug with try/catch block catching exceptions thrown from the callback function
+
 0.1.0 / 2013-12-28
 ==================
 
