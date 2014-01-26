@@ -33,10 +33,15 @@ pnet.get = (method, params = {}, callback) ->
     if err? || !(200 <= +response.statusCode < 300)
       callback(err ? new Error "Response returned status code #{response.statusCode}")
     else
-      try
-        callback(null, url, parseResponseBody(method, body))
-      catch e
-        callback(e)
+      responseBody =
+        try
+          parseResponseBody(method, body)
+        catch e
+          e
+      if responseBody instanceof Error
+        callback(responseBody)
+      else
+        callback(null, url, responseBody)
   undefined
 
 pnet.apikey = (key) ->
